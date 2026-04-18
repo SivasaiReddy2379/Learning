@@ -31,3 +31,18 @@ sed -i '56d' apache-tomcat-9.0.117/conf/tomcat-users.xml
 sed -i '21d' apache-tomcat-9.0.117/webapps/manager/META-INF/context.xml 
 sed -i '22d' apache-tomcat-9.0.117/webapps/manager/META-INF/context.xml 
 sh apache-tomcat-9.0.117/bin/startup.sh
+
+
+
+Nexus artifact installation teps
+
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+cd /opt 
+sudo wget https://download.sonatype.com/nexus/3/nexus-3.91.1-04-linux-x86_64.tar.gz
+sudo tar -xvzf nexus-3.91.0-07-unix.tar.gz
+sudo adduser nexus
+chown -R nexus:nexus nexus-3.91.0-07 sonatype-work
+su - nexus
+cd /app/nexus-3.91.0-07/bin/ 
+./nexus start
