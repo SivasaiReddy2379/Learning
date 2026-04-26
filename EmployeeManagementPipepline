@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK21'
+        gradle "mygradle"
+    }
+
+    stages {
+        stage('code') {
+            steps {
+                git branch: 'master', url: 'https://github.com/SivasaiReddy2379/Learning.git'
+            }
+        }
+
+        stage('build') {
+            steps {
+                dir('employee-management') {
+                     sh 'gradle clean build'
+        }
+    }
+}
+       stage('run') {
+            steps {
+                dir('employee-management')
+                   sh '''
+                   pkill -f 'employee-management-0.0.1-SNAPSHOT.jar' || true
+                   nohup java -jar /var/lib/jenkins/workspace/test/employee-management/build/libs/employee-management-0.0.1-SNAPSHOT.jar --server.port=8081 > /var/lib/jenkins/workspace/test/employee-management/app.log 2>&1 &
+                   '''
+  }
+    }
+}
+}
+    }
