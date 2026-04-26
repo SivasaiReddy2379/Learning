@@ -1,1 +1,1 @@
-INSERT INTO employee (id, name, role, salary) VALUES (1, 'Naveena', 'Developer', 50000);
+INSERT INTO employee (first_name, last_name, department, salary) VALUES ('Naveena', 'K', 'IT', 50000);
