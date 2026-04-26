@@ -19,9 +19,10 @@ public class EmployeeController {
         return employeeService.saveEmployee(employee);
     }
     // get employee details
-    public List<Employee> getAllEmployees(){
-        return employeeService.getAllEmployees();
-    }
+    @GetMapping
+public List<Employee> getAllEmployees(){
+    return employeeService.getAllEmployees();
+}
     // Get employee by ID
     @GetMapping("/{id}")
     public Employee getEmployeeById(@PathVariable Long id){
