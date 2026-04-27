@@ -1,3 +1,3 @@
-def build() {
-   sh 'gradle clean build'
+def call() {
+    sh 'gradle clean build'
 }
