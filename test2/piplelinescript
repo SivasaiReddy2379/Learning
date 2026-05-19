@@ -1,0 +1,59 @@
+--- default node---
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = 'python-sample'
+        CONTAINER_NAME = 'python-sample-container'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git url: 'https://github.com/SivasaiReddy2379/test2.git', branch: 'master'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t python-sample .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker rm -f $CONTAINER_NAME || true
+                docker run --name $CONTAINER_NAME $IMAGE_NAME
+                '''
+            }
+        }
+    }
+}
+
+
+--slave node---
+pipeline {
+    agent { label 'slavenode' }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/SivasaiReddy2379/test2.git'
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh 'docker build -t my-python-app .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'docker run --rm my-python-app'
+            }
+        }
+    }
+}

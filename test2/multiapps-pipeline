@@ -1,0 +1,33 @@
+pipeline {
+    agent { label 'dev' }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/SivasaiReddy2379/test2.git'
+            }
+        }
+
+        stage('Build Images') {
+            steps {
+                sh '''
+                docker build -t python-app -f Dockerfile.python .
+                docker build -t java-app -f Dockerfile.java .
+                '''
+            }
+        }
+
+        stage('Run Containers') {
+            steps {
+                sh '''
+                echo "Running Python Container"
+                docker run -d --name python-container python-app
+
+                echo "Running Java Container"
+                docker run -d --name java-container java-app
+                '''
+            }
+        }
+    }
+}

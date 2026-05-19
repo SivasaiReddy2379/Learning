@@ -1,0 +1,29 @@
+@Library('Shared-Library') _
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                helloWorld()
+            }
+        }
+        stage('Code Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/SivasaiReddy2379/test2.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'docker build -f TomcatDockerfile -t shoppingappimg:v1 .'
+            }
+        }
+
+        stage('Run') {
+            steps {
+               sh 'docker run -itd --name shoppingApp -p 2222:8080 shoppingappimg:v1 '
+            }
+        }
+    }
+}

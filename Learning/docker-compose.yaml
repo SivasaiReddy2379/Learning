@@ -1,0 +1,59 @@
+services:
+  employee:
+    container_name: employee
+    build:
+      context: .
+      dockerfile: EmployeeDockerFile
+    environment:
+      username: sivasai
+      password: Test@123
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
+        reservations:
+          cpus: "0.25"
+          memory: 200M
+    restart: on-failure:3
+
+    ports:
+      - "1111:8081"
+    volumes:
+      - type: volume
+        source: mydata
+        target: /app/employee
+    networks:
+      - employeenetwork
+      - frontendnetwork
+  frontend:
+    container_name: nodejscont
+    build:
+      context : ./app
+      dockerfile : DockerfileNodejs
+    env_file:
+      - ./frontend.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
+        reservations:
+          cpus: "0.25"
+          memory: 250M
+    restart: on-failure:3
+    ports:
+        - "4444:3333"
+    volumes:
+      - type: volume
+        source: frontend
+        target: /app/frontend
+    networks:
+      - frontendnetwork
+volumes:
+  mydata:
+  frontend:
+networks:
+  employeenetwork:
+  frontendnetwork:
+
