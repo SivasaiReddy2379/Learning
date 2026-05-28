@@ -1,0 +1,65 @@
+services:
+  employee:
+    image: sivasaireddy2379/employee:v1
+    ports:
+      - "1111:8081"
+    deploy:
+      replicas: 4
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+    secrets:
+      - mypassword
+    volumes:
+      - type: volume
+        source: employee
+        target: /app/logs
+    networks:
+      - employeenetwork
+
+  nodejs:
+    image: sivasaireddy2379/samplenodejs:v1
+    ports:
+      - "2222:3333"
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          # replicas will run only in worker node
+          - node.role == worker 
+    networks:
+      - employeenetwork
+
+  ott:
+    image: sivasaireddy2379/netflix:v1
+    ports:
+      - "3333:80"
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+    networks:
+      - ottnetwork
+
+secrets:
+  mypassword:
+    external: true
+
+networks:
+  employeenetwork:
+    driver: overlay
+    attachable: true
+
+  ottnetwork:
+    driver: overlay
+    attachable: true
+
+volumes:
+  employee:
