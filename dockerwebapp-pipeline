@@ -16,44 +16,52 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/SivasaiReddy2379/dockerwebapp.git'
             }
         }
-
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqubeserver') {
+                withSonarQubeEnv('sonarqube') {
                     sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=devopsproject1'
                 }
             }
         }
-
-        stage('Build using Maven') {
+        stage('Code build') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
-        stage('Build images') {
+        stage('artifact') {
             steps {
-                sh 'docker build -t sivasaireddy2379/db:v1 Docker-db'
-                sh 'docker build -f AppDockerFile -t sivasaireddy2379/app:v1 .'
+                nexusArtifactUploader artifacts: [[artifactId: 'vprofile', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '54.146.189.108:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'myrepo', version: 'v2'
+            }
+        }
+        stage('Image Build') {
+            steps {
+                sh 'docker run --privileged --rm tonistiigi/binfmt --install all'
+                sh 'docker buildx inspect multiarch >/dev/null 2>&1 || docker buildx create --name multiarch --driver docker-container --use'
+                sh 'docker buildx build --platform linux/amd64 -t sivasaireddy2379/mysql:v1 Docker-db --load'
+                sh 'docker buildx build --platform linux/arm64,linux/amd64 -f Docker-app/Dockerfile -t sivasaireddy2379/javaapp:v1 . --load'
             }
         }
         stage('Image scan') {
             steps {
-                sh 'trivy image sivasaireddy2379/db:v1'
-                sh 'trivy image sivasaireddy2379/app:v1'
+                sh 'trivy image -f table -o trivy-sqlreport.txt sivasaireddy2379/mysql:v1'
+                sh 'trivy image -f table -o trivy-javareport.txt sivasaireddy2379/javaapp:v1'
             }
         }
         stage('Push images to docker hub') {
             steps {
-                withDockerRegistry(credentialsId: 'dockerhubpass') {
-                    sh 'docker push sivasaireddy2379/app:v1'
-                    sh 'docker push sivasaireddy2379/db:v1'
+                script {
+                     withDockerRegistry(credentialsId: 'docker') {
+                        sh 'docker push sivasaireddy2379/javaapp:v1'
+                        sh 'docker push sivasaireddy2379/mysql:v1'
+                }
                 }
             }
         }
-        stage('deploy c') {
+        stage('Deploy') {
             steps {
                 sh 'docker stack deploy -c compose.yml myapp'
             }
         }
+        
     }
 }
