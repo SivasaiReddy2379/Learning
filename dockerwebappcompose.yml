@@ -1,0 +1,27 @@
+version: "3"
+services:
+ devopsdb:
+   image: sivasaireddy2379/mysql:v1
+   ports:
+     - "3306:3306"
+   deploy:
+     replicas: 3
+	 restart_policy:
+	   condition: on-failure
+	   delay: 5s
+	   max_attempts: 5
+
+ application:
+   image: sivasaireddy2379/javaapp:v1
+   ports:
+     - "1111:8080"
+   deploy:
+     replicas: 3
+	 restart_policy:
+	   condition: on-failure
+	   delay: 5s
+	   max_attempts: 5
+   depends_on:
+     - "devopsdb"
+	 
+	 
