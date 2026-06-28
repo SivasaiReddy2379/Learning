@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeploy
+  annotations:
+    kubernetes.io/change-cause: "new image updated"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: netflix
+  template:
+    metadata:
+      labels:
+        app: netflix
+    spec:
+      containers:
+        - name: netflixcontainer
+          image: sivasaireddy2379/netflix:v1
+          ports:
+            - containerPort: 80
