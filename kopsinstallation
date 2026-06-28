@@ -15,7 +15,7 @@ export KOPS_STATE_STORE=s3://sivasai.devops2379
 
 kops create cluster \
   --name sivasai.k8s.local \
-  --zones us-east-2a,us-east-2b \
+  --zones us-east-1a,us-east-1b \
   --control-plane-size c7i-flex.large \
   --control-plane-count 1 \
   --control-plane-volume-size 20 \
