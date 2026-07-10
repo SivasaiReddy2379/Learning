@@ -1,9 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mydeploy
   annotations:
-    kubernetes.io/change-cause: "new image updated"
+    kubernetes.io/change-cause: "new image updated by sivasai"
+  name: mydeploy
+  labels:
+    env: test
 spec:
   replicas: 3
   selector:
@@ -15,7 +17,54 @@ spec:
         app: netflix
     spec:
       containers:
-        - name: netflixcontainer
-          image: sivasaireddy2379/netflix:v1
+        - image: sivasaireddy2379/game:v1
+          name: netflixcont
           ports:
             - containerPort: 80
+          volumeMounts:
+            - mountPath: "/srv/temenos"
+              name: hostvol
+        - image: sivasaireddy2379/cycle:v1
+          name: cyclecont
+          command: ["/bin/bash", "-c", "while true; do echo welcome; sleep 10; done"]
+          volumeMounts:
+            - name: hostvol
+              mountPath: "/opt/jboss"
+      volumes:
+       # - name: volumeclass
+       #   emptyDir: {}
+        - name: hostvol
+          hostPath:
+            path: /srv/log
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysvc
+spec:
+  type: LoadBalancer
+  selector:
+    app: netflix
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myhpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mydeploy
+  minReplicas: 3
+  maxReplicas: 6
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization 
+          averageUtilization: 60
