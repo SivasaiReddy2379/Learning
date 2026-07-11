@@ -30,6 +30,9 @@ spec:
                 configMapKeyRef:
                   name: mycm
                   key: api_user
+          envFrom:
+            - secretRef:
+                name: mysecret
         - image: sivasaireddy2379/cycle:v1
           name: cyclecont
           command: ["/bin/bash", "-c", "while true; do echo welcome; sleep 10; done"]
@@ -39,6 +42,12 @@ spec:
           envFrom:
             - configMapRef:
                   name: mycm
+          env:
+            - name: jdbcurl
+              valueFrom: 
+                secretKeyRef:
+                  name: mysecret
+                  key: jdbc_url
       volumes:
        # - name: volumeclass
        #   emptyDir: {}
