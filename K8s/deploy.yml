@@ -23,20 +23,28 @@ spec:
             - containerPort: 80
           volumeMounts:
             - mountPath: "/srv/temenos"
-              name: hostvol
+              name: pvcvol
+          env:
+            - name: APIUSER
+              valueFrom:
+                configMapKeyRef:
+                  name: mycm
+                  key: api_user
         - image: sivasaireddy2379/cycle:v1
           name: cyclecont
           command: ["/bin/bash", "-c", "while true; do echo welcome; sleep 10; done"]
           volumeMounts:
-            - name: hostvol
+            - name: pvcvol
               mountPath: "/opt/jboss"
+          envFrom:
+            - configMapRef:
+                  name: mycm
       volumes:
        # - name: volumeclass
        #   emptyDir: {}
-        - name: hostvol
-          hostPath:
-            path: /srv/log
-            type: DirectoryOrCreate
+        - name: pvcvol
+          persistentVolumeClaim:
+            claimName: mypvc
 ---
 apiVersion: v1
 kind: Service
