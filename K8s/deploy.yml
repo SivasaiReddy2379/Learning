@@ -36,6 +36,7 @@ spec:
         - name: hostvol
           hostPath:
             path: /srv/log
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
